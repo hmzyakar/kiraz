@@ -9,7 +9,6 @@
 #include <kiraz/token/Operator.h>
 #include <kiraz/token/Identifier.h>
 #include <kiraz/token/Keyword.h>
-#include <kiraz/token/Rejected.h>
 
 static auto &colno = Token::colno;
 using namespace token;
@@ -20,8 +19,6 @@ extern std::shared_ptr<Token> curtoken;
 
 %%
 
-
-/*Keywords*/
 "return" {colno +=yyleng; curtoken = Token::New<KwReturn>(); return KW_RETURN;}
 "let" {colno +=yyleng; curtoken = Token::New<KwLet>(); return KW_LET;}
 "import" {colno +=yyleng; curtoken = Token::New<KwImport>(); return KW_IMPORT;}
@@ -32,7 +29,6 @@ extern std::shared_ptr<Token> curtoken;
 "class" {colno +=yyleng; curtoken = Token::New<KwClass>(); return KW_CLASS;}
 
 
-/*Operators*/
 "{" {colno +=yyleng; curtoken = Token::New<OpLCurlyBr>(); return OP_LCURLYBR;}
 "}" {colno +=yyleng; curtoken = Token::New<OpRCurlyBr>(); return OP_RCURLYBR;}
 "(" {colno +=yyleng; curtoken = Token::New<OpLParen>(); return OP_LPAREN;}
@@ -44,20 +40,25 @@ extern std::shared_ptr<Token> curtoken;
 "<" {colno +=yyleng; curtoken = Token::New<OpLessThan>(); return OP_LESSTHAN;}
 "=" {colno +=yyleng; curtoken = Token::New<OpAssign>(); return OP_ASSIGN;}
 ">" {colno +=yyleng; curtoken = Token::New<OpGreaterThan>(); return OP_GREATERTHAN;}
+">=" {colno +=yyleng; curtoken = Token::New<OpGreaterEquals>(); return OP_GREATEREQUALS;}
+"<=" {colno +=yyleng; curtoken = Token::New<OpLessEquals>(); return OP_LESSEQUALS;}
+"==" {colno +=yyleng; curtoken = Token::New<OpEquals>(); return OP_EQUALS;}
+"!=" {colno +=yyleng; curtoken = Token::New<OpNotEquals>(); return OP_NOTEQUALS;}
 ":" {colno +=yyleng; curtoken = Token::New<OpColon>(); return OP_COLON;}
 ";" {colno +=yyleng; curtoken = Token::New<OpSemiColon>(); return OP_SEMICOLON;}
 "," {colno +=yyleng; curtoken = Token::New<OpComma>(); return OP_COMMA;}
+"." {colno +=yyleng; curtoken = Token::New<OpDot>(); return OP_DOT;}
 
 
-/*Literals*/
 [0-9]+ {colno +=yyleng; curtoken = Token::New<Integer>(10,yytext); return L_INTEGER;}
 \"(\\.|[^"\\])*\" {colno +=yyleng; curtoken = Token::New<String>(yytext); return L_STRING;}
 
-/*Spacing*/
+
 [ \n\t]+ {colno +=yyleng;}
 
 
-/*Rejected*/
-. {colno+=yyleng; curtoken=Token::New<Rejected>("tmp"); return YYUNDEF;}
+[a-zA-Z_][a-zA-Z_0-9]* {colno +=yyleng; curtoken = Token::New<Identifier>(yytext); return IDENTIFIER;}
 
+
+. {colno +=yyleng; curtoken = Token::New<Rejected>(yytext); return YYUNDEF;}
 

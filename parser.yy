@@ -11,9 +11,41 @@ extern std::shared_ptr<Token> curtoken;
 extern int yylineno;
 %}
 
-%token    REJECTED
+%token KW_RETURN
+%token KW_CLASS
+%token KW_ELSE
+%token KW_FUNC
+%token KW_IF
+%token KW_IMPORT
+%token KW_LET
+%token KW_WHILE
 
-/* TODO */
+%token  OP_ASSIGN
+%token  OP_COLON
+%token  OP_COMMA
+%token  OP_DIVF
+%token  OP_DOT
+%token  OP_EQUALS
+%token  OP_GREATEREQUALS
+%token  OP_GREATERTHAN
+%token  OP_LCURLYBR
+%token  OP_LESSEQUALS
+%token  OP_LESSTHAN
+%token  OP_LPAREN
+%token  OP_MINUS
+%token  OP_MULT
+%token  OP_NOTEQUALS
+%token  OP_PLUS
+%token  OP_RCURLYBR
+%token  OP_RPAREN
+%token  OP_SEMICOLON
+
+%token L_INTEGER
+%token L_STRING
+
+%token IDENTIFIER
+
+%token  REJECTED
 
 %%
 
