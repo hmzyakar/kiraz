@@ -105,6 +105,10 @@ add_library(kiraz STATIC
     kiraz/token/Literal.cpp
     kiraz/token/Operator.h
     kiraz/token/Operator.cpp
+    kiraz/token/Identifier.h
+    kiraz/token/Identifier.cpp
+    kiraz/token/Keyword.h
+    kiraz/token/Keyword.cpp    
 
     kiraz/Node.h
     kiraz/Node.cpp

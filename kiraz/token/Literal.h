@@ -11,7 +11,7 @@ public:
     Integer(int64_t base, std::string_view value) : Token(L_INTEGER), m_base(base), m_value(value){}
     virtual ~Integer();
 
-    std::string as_string() const override {return fmt::format("Integer_{}",m_value);}
+    std::string as_string() const override {return fmt::format("Integer{()}",m_value);}
     void print(){fmt::print("{}\n",as_string());}
 
     static int colno;
@@ -32,7 +32,7 @@ public:
     String(const char *text) : Token(L_STRING), m_text(text){}
     virtual ~String();
 
-    std::string as_string() const override {return fmt::format("String_{}", m_text);}
+    std::string as_string() const override {return fmt::format("String{()}", m_text);}
     void print(){fmt::print("{}\n",as_string());}
 
     static int colno;
