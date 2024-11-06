@@ -4,28 +4,42 @@
 #include <kiraz/Node.h>
 
 namespace ast {
+
 class Integer : public Node {
 public:
     Integer(Token::Ptr);
 
-    std::string as_string() const override { return fmt::format("Integer({})", m_value); }
-
+    std::string as_string() const override {return fmt::format("Int({})",m_value);}
 private:
     int64_t m_value;
 };
 
+class String : public Node {
+public:
+    String(Token::Ptr);
+
+    std::string as_string() const override {return fmt::format("Str({})",m_value);}
+private:
+    std::string m_value;
+};
+
+
+
+
+
 class SignedNode : public Node {
 public:
-    SignedNode(int op, Node::Cptr integer) : Node(L_INTEGER), m_operator(op), m_integer(integer) {}
+    SignedNode(int sign, Node::Cptr node) :  m_sign(sign), m_node(node) {};
 
     std::string as_string() const override {
-        return fmt::format("Integer({},{})", m_operator, m_integer->as_string());
+        return fmt::format("SignedNode({},{})", m_sign, m_node->as_string());
     }
 
 private:
-    int m_operator;
-    Node::Cptr m_integer;
+    int m_sign;
+    Node::Cptr m_node;
 };
+
 }
 
 #endif

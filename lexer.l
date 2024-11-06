@@ -28,7 +28,6 @@ extern std::shared_ptr<Token> curtoken;
 "while" {colno +=yyleng; curtoken = Token::New<KwWhile>(); return KW_WHILE;}
 "class" {colno +=yyleng; curtoken = Token::New<KwClass>(); return KW_CLASS;}
 
-
 "{" {colno +=yyleng; curtoken = Token::New<OpLCurlyBr>(); return OP_LCURLYBR;}
 "}" {colno +=yyleng; curtoken = Token::New<OpRCurlyBr>(); return OP_RCURLYBR;}
 "(" {colno +=yyleng; curtoken = Token::New<OpLParen>(); return OP_LPAREN;}
@@ -49,16 +48,12 @@ extern std::shared_ptr<Token> curtoken;
 "," {colno +=yyleng; curtoken = Token::New<OpComma>(); return OP_COMMA;}
 "." {colno +=yyleng; curtoken = Token::New<OpDot>(); return OP_DOT;}
 
-
 [0-9]+ {colno +=yyleng; curtoken = Token::New<Integer>(10,yytext); return L_INTEGER;}
 \"(\\.|[^"\\])*\" {colno +=yyleng; curtoken = Token::New<String>(yytext); return L_STRING;}
 
-
-[ \n\t]+ {colno +=yyleng;}
-
-
 [a-zA-Z_][a-zA-Z_0-9]* {colno +=yyleng; curtoken = Token::New<Identifier>(yytext); return IDENTIFIER;}
 
+[ \n\t]+ {colno +=yyleng;}
 
 . {colno +=yyleng; curtoken = Token::New<Rejected>(yytext); return YYUNDEF;}
 

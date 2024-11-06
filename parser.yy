@@ -3,8 +3,15 @@
 
 #include <kiraz/ast/Operator.h>
 #include <kiraz/ast/Literal.h>
+#include <kiraz/ast/Keyword.h>
+#include <kiraz/ast/Identifier.h>
+
 
 #include <kiraz/token/Literal.h>
+#include <kiraz/token/Identifier.h>
+#include <kiraz/token/Keyword.h>
+#include <kiraz/token/Operator.h>
+
 
 int yyerror(const char *msg);
 extern std::shared_ptr<Token> curtoken;
@@ -45,13 +52,58 @@ extern int yylineno;
 
 %token IDENTIFIER
 
-%token  REJECTED
+%token REJECTED
+
+%left OP_PLUS OP_MINUS
+%left OP_MULT OP_DIVF
+%left OP_ASSIGN
+
 
 %%
 
-/* TODO */
 
-stmt: %empty
+stmt:
+    OP_LPAREN stmt OP_RPAREN {$$ = $2;}
+    | addsub
+    ;
+
+dec:
+    stmt
+    | identifier OP_ASSIGN stmt {$$ = Node::add<ast::OpAssign>($1, $3);}
+    | let
+    ;
+
+let:
+    KW_LET identifier OP_ASSIGN stmt OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, nullptr, $4);}
+    | KW_LET identifier OP_COLON identifier OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
+    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, $4, $6);}
+    ;
+
+addsub:
+    muldiv
+    |stmt OP_PLUS stmt {$$ = Node::add<ast::OpAdd>($1, $3);}
+    |stmt OP_MINUS stmt {$$ = Node::add<ast::OpSub>($1, $3);}
+    ;
+
+muldiv:
+    posneg
+    | stmt OP_MULT stmt { $$ = Node::add<ast::OpMult>($1, $3);}
+    | stmt OP_DIVF stmt { $$ = Node::add<ast::OpDivF>($1, $3);}
+    ;
+
+posneg:
+    integer
+    | OP_PLUS stmt { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2);}
+    | OP_MINUS stmt { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2);}
+    ;
+
+identifier:
+    IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
+    ;
+
+integer:
+    L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
+    ;
 
 %%
 

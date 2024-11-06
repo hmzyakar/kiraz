@@ -36,12 +36,12 @@ public:
             StrOP = "DivF";
             break;
         case OP_ASSIGN:
-            StrOP = "Assign";
+            StrOP = "OP_ASSIGN";
             break;
         default:
             break;
         }
-        return fmt::format("{}({},{})", StrOP, get_left()->as_string(), get_right()->as_string());
+        return fmt::format("{}(l={}, r={})", StrOP, get_left()->as_string(), get_right()->as_string());
     }
 
 private:
