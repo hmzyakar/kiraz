@@ -14,11 +14,13 @@ private:
     int64_t m_value;
 };
 
+
+
+
 class String : public Node {
 public:
     String(Token::Ptr);
-
-    std::string as_string() const override {return fmt::format("Str({})",m_value);}
+    std::string as_string() const override {return fmt::format("Str({})", m_value.substr(1, m_value.size() - 2));}
 private:
     std::string m_value;
 };

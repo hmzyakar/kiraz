@@ -118,20 +118,52 @@ public:
                     "If(?={}, then=[{}], else=[])", m_check->as_string(), m_then->as_string());
         }
         else if (m_then == nullptr) {
-            return fmt::format(
-                    "If(?={}, then=[], else=[{}])", m_check->as_string(), m_else->as_string());
+            std::string else_case_as_str = m_else->as_string();
+            if (else_case_as_str.compare("if") == 0) {
+                return fmt::format(
+                        "If(?={}, then=[], else={})", m_check->as_string(), else_case_as_str);
+            }
+            else {
+                return fmt::format(
+                        "If(?={}, then=[], else=[{}])", m_check->as_string(), else_case_as_str);
+            }
         }
         else {
-            return fmt::format("If(?={}, then=[{}], else=[{}])", m_check->as_string(),
+            std::string else_case_as_str = m_else->as_string();
+            if (else_case_as_str.compare("if") == 0) {
+                return fmt::format("If(?={}, then=[{}], else={})", m_check->as_string(),
                     m_then->as_string(), m_else->as_string());
+            }
+            else {
+               return fmt::format("If(?={}, then=[{}], else=[{}])", m_check->as_string(),
+                    m_then->as_string(), m_else->as_string());
+            }
         }
     }
 
 private:
     Node::Ptr m_check, m_then, m_else;
 };
+
+class KwClass : public Node {
+
+public:
+    KwClass(Node::Ptr id_node, Node::Ptr scope_node)
+            : m_id_node(id_node), m_scope_node(scope_node) {}
+    std::string as_string() const override {
+        if (m_scope_node == nullptr) {
+            return fmt::format("Class(n={}, s=[])", m_id_node->as_string());
+        }
+
+        else {
+            return fmt::format(
+                    "Class(n={}, s=[{}])", m_id_node->as_string(), m_scope_node->as_string());
+        }
+    }
+
+private:
+    Node::Ptr m_scope_node, m_id_node;
 };
-
-
+};
 
 #endif // KIRAZ_AST_OPERATOR_H

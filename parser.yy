@@ -79,6 +79,7 @@ line:
     |return OP_SEMICOLON
     |while OP_SEMICOLON
     |if OP_SEMICOLON
+    |class OP_SEMICOLON
 ;
 
 stmt:
@@ -118,6 +119,10 @@ if:
     |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $8);}
     |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, $6, $9);}
     ;
+
+class:
+    KW_CLASS identifier OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, nullptr);}
+    |KW_CLASS identifier OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, $4);}
 
 addsub:
     muldiv
