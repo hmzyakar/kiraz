@@ -42,11 +42,24 @@ class KwImport : public Node {
 public:
     KwImport(Node::Ptr lib_node) : m_lib_node(lib_node) {}
     std::string as_string() const override {
-        return fmt::format("Import(Id({}))", m_lib_node->as_string());
+        return fmt::format("Import({})", m_lib_node->as_string());
     }
 
 private:
     Node::Ptr m_lib_node;
+};
+
+
+class KwReturn : public Node {
+
+public:
+    KwReturn(Node::Ptr ret_node) : m_ret_node(ret_node) {}
+    std::string as_string() const override {
+        return fmt::format("Return({})", m_ret_node->as_string());
+    }
+
+private:
+    Node::Ptr m_ret_node;
 };
 
 }

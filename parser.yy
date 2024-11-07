@@ -56,21 +56,19 @@ extern int yylineno;
 
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
-%left OP_ASSIGN
-
 
 %%
 
 
 program:
     lines {$$ = Node::add<ast::Module>($1);}
+    | %empty
     ;
 
 lines:
     lines line
     |line;
     ;
-
 
 
 stmt:
@@ -80,16 +78,27 @@ stmt:
     | assign
     ;
 
+import:
+    KW_IMPORT identifier {$$ = Node::add<ast::KwImport>($2);}
+    ;
+
 let:
     KW_LET identifier OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, nullptr, $4);}
     | KW_LET identifier OP_COLON typeanot  {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
     | KW_LET identifier OP_COLON typeanot OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, $4, $6);}
     ;
 
+return:
+    KW_RETURN l_integer {$$ = Node::add<ast::KwReturn>($2);}
+    | KW_RETURN l_string {$$ = Node::add<ast::KwReturn>($2);}
+    | KW_RETURN cmp {$$ = Node::add<ast::KwReturn>($2);}
+
 line:
     let OP_SEMICOLON
     |stmt 
     |stmt OP_SEMICOLON
+    |import OP_SEMICOLON
+    |return OP_SEMICOLON
 ;
 
 addsub:
@@ -135,6 +144,9 @@ l_integer:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
     ;
 
+l_string:
+    L_STRING { $$ = Node::add<ast::String>(curtoken);}
+    ;
 %%
 
 int yyerror(const char *s) {
