@@ -49,7 +49,6 @@ private:
     Node::Ptr m_lib_node;
 };
 
-
 class KwReturn : public Node {
 
 public:
@@ -62,6 +61,77 @@ private:
     Node::Ptr m_ret_node;
 };
 
-}
+class KwWhile : public Node {
+
+public:
+    KwWhile(Node::Ptr check, Node::Ptr repeat) : m_check(check), m_repeat(repeat) {}
+
+    std::string as_string() const override {
+        if (m_repeat == nullptr) {
+            return fmt::format("While(?={}, repeat=[])", m_check->as_string());
+        }
+        else {
+            return fmt::format(
+                    "While(?={}, repeat=[{}])", m_check->as_string(), m_repeat->as_string());
+        }
+    }
+
+private:
+    Node::Ptr m_check, m_repeat;
+};
+
+class lines : public Node {
+private:
+    std::vector<Node::Ptr> line_as_vec;
+
+public:
+    lines(Node::Ptr line) { line_as_vec.push_back(line); }
+    lines(lines *val) { *this = *val; }
+    lines *push_line(Node::Ptr line) {
+        line_as_vec.push_back(line);
+        return this;
+    }
+
+    std::string as_string() const override {
+        std::string lines_str;
+        for (int i = 0; i < line_as_vec.size(); i++) {
+            lines_str += line_as_vec[i]->as_string();
+            if (i != line_as_vec.size() - 1) {
+                lines_str += ", ";
+            }
+        }
+        return lines_str;
+    }
+};
+class KwIf : public Node {
+
+public:
+    KwIf(Node::Ptr check, Node::Ptr then, Node::Ptr else_case)
+            : m_check(check), m_then(then), m_else(else_case) {}
+
+    std::string as_string() const override {
+        if (m_then == nullptr && m_else == nullptr) {
+            return fmt::format("If(?={}, then=[], else=[])", m_check->as_string());
+        }
+        else if (m_else == nullptr) {
+            return fmt::format(
+                    "If(?={}, then=[{}], else=[])", m_check->as_string(), m_then->as_string());
+        }
+        else if (m_then == nullptr) {
+            return fmt::format(
+                    "If(?={}, then=[], else=[{}])", m_check->as_string(), m_else->as_string());
+        }
+        else {
+            return fmt::format("If(?={}, then=[{}], else=[{}])", m_check->as_string(),
+                    m_then->as_string(), m_else->as_string());
+        }
+    }
+
+private:
+    Node::Ptr m_check, m_then, m_else;
+};
+};
+
+
 
 #endif // KIRAZ_AST_OPERATOR_H

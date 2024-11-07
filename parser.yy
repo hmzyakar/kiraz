@@ -56,6 +56,7 @@ extern int yylineno;
 
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
+%left OP_ASSIGN
 
 %%
 
@@ -66,16 +67,25 @@ program:
     ;
 
 lines:
-    lines line
-    |line;
+    lines line {ast::lines* x=(ast::lines*)$1.get();$$ = Node::add<ast::lines>(x->push_line($2));}
+    |line {$$ = Node::add<ast::lines>($1); }
     ;
 
+line:
+    let OP_SEMICOLON
+    |stmt OP_SEMICOLON
+    |assign OP_SEMICOLON
+    |import OP_SEMICOLON
+    |return OP_SEMICOLON
+    |while OP_SEMICOLON
+    |if OP_SEMICOLON
+;
 
 stmt:
     OP_LPAREN stmt OP_RPAREN {$$ = $2;}
     | addsub 
     | cmp
-    | assign
+    |l_string
     ;
 
 import:
@@ -84,22 +94,30 @@ import:
 
 let:
     KW_LET identifier OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, nullptr, $4);}
-    | KW_LET identifier OP_COLON typeanot  {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
-    | KW_LET identifier OP_COLON typeanot OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, $4, $6);}
+    |KW_LET identifier OP_COLON identifier  {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
+    |KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, $4, $6);}
     ;
 
 return:
-    KW_RETURN l_integer {$$ = Node::add<ast::KwReturn>($2);}
-    | KW_RETURN l_string {$$ = Node::add<ast::KwReturn>($2);}
-    | KW_RETURN cmp {$$ = Node::add<ast::KwReturn>($2);}
+    KW_RETURN stmt {$$ = Node::add<ast::KwReturn>($2);}
+    ;
 
-line:
-    let OP_SEMICOLON
-    |stmt 
-    |stmt OP_SEMICOLON
-    |import OP_SEMICOLON
-    |return OP_SEMICOLON
-;
+while:
+    KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, nullptr);}
+    |KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, $6);}
+    |KW_WHILE OP_LPAREN cmp OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, nullptr);}
+    ;
+
+if:
+    KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, nullptr);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, nullptr);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $9);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, $10);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $8);}
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, $6, $9);}
+    ;
 
 addsub:
     muldiv
@@ -136,9 +154,6 @@ identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
     ;
 
-typeanot:
-    IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
-    ;
 
 l_integer:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
