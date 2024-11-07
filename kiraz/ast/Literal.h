@@ -32,7 +32,18 @@ public:
     SignedNode(int sign, Node::Cptr node) :  m_sign(sign), m_node(node) {};
 
     std::string as_string() const override {
-        return fmt::format("SignedNode({},{})", m_sign, m_node->as_string());
+        std::string StrOP;
+        switch (m_sign) {
+        case OP_PLUS:
+            StrOP = "OP_PLUS";
+            break;
+        case OP_MINUS:
+            StrOP = "OP_MINUS";
+            break;
+        default:
+            break;
+        }
+        return fmt::format("Signed({}, {})", StrOP, m_node->as_string());
     }
 
 private:

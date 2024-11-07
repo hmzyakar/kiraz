@@ -27,6 +27,5 @@ String::String(Token::Ptr t) : Node(L_STRING){
 }
 
 
-
 }
 

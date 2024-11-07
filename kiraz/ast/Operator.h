@@ -36,12 +36,29 @@ public:
             StrOP = "DivF";
             break;
         case OP_ASSIGN:
-            StrOP = "OP_ASSIGN";
+            StrOP = "Assign";
             break;
+        case OP_EQUALS:
+            StrOP = "OpEq";
+            break;
+        case OP_GREATERTHAN:
+            StrOP = "OpGt";
+            break;
+        case OP_GREATEREQUALS:
+            StrOP = "OpGe";
+            break;
+        case OP_LESSTHAN:
+            StrOP = "OpLt";
+            break;
+        case OP_LESSEQUALS:
+            StrOP = "OpLe";
+            break;
+
         default:
             break;
         }
-        return fmt::format("{}(l={}, r={})", StrOP, get_left()->as_string(), get_right()->as_string());
+        return fmt::format(
+                "{}(l={}, r={})", StrOP, get_left()->as_string(), get_right()->as_string());
     }
 
 private:
@@ -71,6 +88,31 @@ public:
 class OpAssign : public Operator {
 public:
     OpAssign(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_ASSIGN, left, right) {}
+};
+
+class OpEq : public Operator {
+public:
+    OpEq(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_EQUALS, left, right) {}
+};
+
+class OpGt : public Operator {
+public:
+    OpGt(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_GREATERTHAN, left, right) {}
+};
+
+class OpGe : public Operator {
+public:
+    OpGe(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_GREATEREQUALS, left, right) {}
+};
+
+class OpLt : public Operator {
+public:
+    OpLt(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_LESSTHAN, left, right) {}
+};
+
+class OpLe : public Operator {
+public:
+    OpLe(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_LESSEQUALS, left, right) {}
 };
 
 }

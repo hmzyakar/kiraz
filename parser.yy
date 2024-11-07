@@ -5,7 +5,7 @@
 #include <kiraz/ast/Literal.h>
 #include <kiraz/ast/Keyword.h>
 #include <kiraz/ast/Identifier.h>
-
+#include <kiraz/ast/Module.h>
 
 #include <kiraz/token/Literal.h>
 #include <kiraz/token/Identifier.h>
@@ -52,7 +52,7 @@ extern int yylineno;
 
 %token IDENTIFIER
 
-%token REJECTED
+%token  REJECTED
 
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
@@ -62,22 +62,35 @@ extern int yylineno;
 %%
 
 
-stmt:
-    OP_LPAREN stmt OP_RPAREN {$$ = $2;}
-    | addsub
+program:
+    lines {$$ = Node::add<ast::Module>($1);}
     ;
 
-dec:
-    stmt
-    | identifier OP_ASSIGN stmt {$$ = Node::add<ast::OpAssign>($1, $3);}
-    | let
+lines:
+    lines line
+    |line;
+    ;
+
+
+
+stmt:
+    OP_LPAREN stmt OP_RPAREN {$$ = $2;}
+    | addsub 
+    | cmp
+    | assign
     ;
 
 let:
-    KW_LET identifier OP_ASSIGN stmt OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, nullptr, $4);}
-    | KW_LET identifier OP_COLON identifier OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt OP_SEMICOLON {$$ = Node::add<ast::KwLet>($2, $4, $6);}
+    KW_LET identifier OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, nullptr, $4);}
+    | KW_LET identifier OP_COLON typeanot  {$$ = Node::add<ast::KwLet>($2, $4, nullptr);}
+    | KW_LET identifier OP_COLON typeanot OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, $4, $6);}
     ;
+
+line:
+    let OP_SEMICOLON
+    |stmt 
+    |stmt OP_SEMICOLON
+;
 
 addsub:
     muldiv
@@ -92,16 +105,33 @@ muldiv:
     ;
 
 posneg:
-    integer
+    l_integer
     | OP_PLUS stmt { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2);}
     | OP_MINUS stmt { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2);}
+    | identifier
+    ;
+
+cmp:
+    identifier OP_EQUALS identifier { $$ = Node::add<ast::OpEq>($1, $3);}
+    |identifier OP_GREATEREQUALS identifier { $$ = Node::add<ast::OpGe>($1, $3);}
+    |identifier OP_GREATERTHAN identifier { $$ = Node::add<ast::OpGt>($1, $3);}
+    |identifier OP_LESSEQUALS identifier { $$ = Node::add<ast::OpLe>($1, $3);}
+    |identifier OP_LESSTHAN identifier { $$ = Node::add<ast::OpLt>($1, $3);}
+    ;
+
+assign:
+    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3);}
     ;
 
 identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
     ;
 
-integer:
+typeanot:
+    IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
+    ;
+
+l_integer:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
     ;
 

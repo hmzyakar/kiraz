@@ -55,6 +55,8 @@ struct ParserFixture : public testing::Test {
         ASSERT_TRUE(root_ast.starts_with("Module(["));
         ASSERT_TRUE(root_ast.ends_with("])"));
         ASSERT_EQ(root_ast.substr(8, root_ast.size() - 10), ast);
+        //ASSERT_EQ(root_ast, ast);
+
     }
 
     void verify_no_root(const std::string &code) {

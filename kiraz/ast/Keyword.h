@@ -9,7 +9,9 @@ class KwLet : public Node {
 
 public:
     KwLet(Node::Ptr variable_node, Node::Ptr type_node, Node::Ptr init_value_node)
-            : m_variable_node(variable_node), m_type_node(type_node), m_init_value_node(init_value_node) {}
+            : m_variable_node(variable_node)
+            , m_type_node(type_node)
+            , m_init_value_node(init_value_node) {}
 
     std::string as_string() const override {
         std::string m_variable_node_string = m_variable_node->as_string();
@@ -33,6 +35,18 @@ public:
 
 private:
     Node::Ptr m_variable_node, m_type_node, m_init_value_node;
+};
+
+class KwImport : public Node {
+
+public:
+    KwImport(Node::Ptr lib_node) : m_lib_node(lib_node) {}
+    std::string as_string() const override {
+        return fmt::format("Import(Id({}))", m_lib_node->as_string());
+    }
+
+private:
+    Node::Ptr m_lib_node;
 };
 
 }
