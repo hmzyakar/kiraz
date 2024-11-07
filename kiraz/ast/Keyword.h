@@ -119,7 +119,7 @@ public:
         }
         else if (m_then == nullptr) {
             std::string else_case_as_str = m_else->as_string();
-            if (else_case_as_str.compare("if") == 0) {
+            if (else_case_as_str.rfind("If", 0) == 0) {
                 return fmt::format(
                         "If(?={}, then=[], else={})", m_check->as_string(), else_case_as_str);
             }
@@ -130,7 +130,7 @@ public:
         }
         else {
             std::string else_case_as_str = m_else->as_string();
-            if (else_case_as_str.compare("if") == 0) {
+            if (else_case_as_str.rfind("If", 0) == 0) {
                 return fmt::format("If(?={}, then=[{}], else={})", m_check->as_string(),
                     m_then->as_string(), m_else->as_string());
             }
