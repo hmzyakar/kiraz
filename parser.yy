@@ -130,14 +130,14 @@ while:
     ;
 
 if:
-     KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $9); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $10); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $9); }
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $8); }
+     KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $9); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $10); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $9); }
+    |KW_IF OP_LPAREN stmt OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $8); }
     ;
 
 dot:  
