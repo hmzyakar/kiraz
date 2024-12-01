@@ -18,14 +18,13 @@ Integer::Integer(Token::Ptr t) : Node(L_INTEGER){
 
 String::String(Token::Ptr t) : Node(L_STRING){
     assert(t->get_id()== L_STRING);
-    auto token_str = std::static_pointer_cast<const token::Integer>(t);
+    auto token_str = std::static_pointer_cast<const token::String>(t);
     try{
         m_value = token_str->get_value();
     }
     catch(std::out_of_range &e){
     }
 }
-
 
 }
 

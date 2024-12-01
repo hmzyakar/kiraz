@@ -53,6 +53,9 @@ public:
         case OP_LESSEQUALS:
             StrOP = "OpLe";
             break;
+        case OP_DOT:
+            StrOP = "Dot";
+            break;       
 
         default:
             break;
@@ -113,6 +116,11 @@ public:
 class OpLe : public Operator {
 public:
     OpLe(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_LESSEQUALS, left, right) {}
+};
+
+class OpDot : public Operator{
+public:
+    OpDot(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_DOT, left, right){}
 };
 
 }

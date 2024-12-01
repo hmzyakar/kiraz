@@ -11,7 +11,7 @@ public:
 
     std::string as_string() const override {
 
-        return fmt::format("Module([{}])",m_node->as_string());
+        return fmt::format("Module({})",m_node->as_string());
     }
 
 private:

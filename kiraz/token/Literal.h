@@ -24,21 +24,22 @@ private:
     std::string m_value;
 };
 
-class String : public Token {
-public:
-    String(const char *text) : Token(L_STRING), m_value(text) {}
-    virtual ~String();
 
-    std::string as_string() const override { return fmt::format("Str({})", m_value); }
-    void print() { fmt::print("{}\n", as_string()); }
+    class String : public Token {
+        public:
+        String(std::string_view value) : Token(L_STRING),m_value(value){}
+        virtual ~String();
 
-    static int colno;
+        std::string as_string() const override {return fmt::format("STRING_{}",m_value);}
+        void print(){fmt::print("{}\n",as_string());}
 
-    auto get_value() const { return m_value; }
+        static int colno;
 
-private:
-    std::string m_value;
-};
+        auto get_value() const {return m_value;}
+
+        private:
+            std::string m_value;
+    };
 
 }
 

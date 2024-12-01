@@ -49,15 +49,19 @@ extern int yylineno;
 
 %token L_INTEGER
 %token L_STRING
+%token L_BOOLEAN
+%token L_FLOAT
 
 %token IDENTIFIER
 
-%token  REJECTED
+%token ARGUMENT_LIST
+
+%token REJECTED
 
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
 %left OP_ASSIGN
-
+%left OP_EQUALS OP_GREATERTHAN OP_LESSTHAN OP_GREATEREQUALS OP_LESSEQUALS
 %%
 
 
@@ -67,12 +71,13 @@ program:
     ;
 
 lines:
-    lines line {ast::lines* x=(ast::lines*)$1.get();$$ = Node::add<ast::lines>(x->push_line($2));}
+    lines line {ast::lines* lines_instance=(ast::lines*)$1.get();$$ = Node::add<ast::lines>(lines_instance->add_line($2));}
     |line {$$ = Node::add<ast::lines>($1); }
     ;
 
 line:
-    let OP_SEMICOLON
+    function OP_SEMICOLON
+    |let OP_SEMICOLON
     |stmt OP_SEMICOLON
     |assign OP_SEMICOLON
     |import OP_SEMICOLON
@@ -86,7 +91,8 @@ stmt:
     OP_LPAREN stmt OP_RPAREN {$$ = $2;}
     | addsub 
     | cmp
-    |l_string
+    | call
+    | dot
     ;
 
 import:
@@ -99,25 +105,57 @@ let:
     |KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {$$ = Node::add<ast::KwLet>($2, $4, $6);}
     ;
 
+function:
+    KW_FUNC identifier OP_LPAREN func_arg_list OP_RPAREN OP_COLON identifier OP_LCURLYBR lines OP_RCURLYBR{$$ = Node::add<ast::KwFunc>($2, $4, $7, $9); }
+    |KW_FUNC identifier OP_LPAREN OP_RPAREN OP_COLON identifier OP_LCURLYBR lines OP_RCURLYBR{$$ = Node::add<ast::KwFunc>($2, nullptr, $6, $8); }
+    |KW_FUNC identifier OP_LPAREN func_arg_list OP_RPAREN OP_COLON identifier OP_LCURLYBR OP_RCURLYBR{$$ = Node::add<ast::KwFunc>($2, $4, $7, nullptr); }
+    |KW_FUNC identifier OP_LPAREN OP_RPAREN OP_COLON identifier OP_LCURLYBR OP_RCURLYBR{$$ = Node::add<ast::KwFunc>($2, nullptr, $6, nullptr); }
+    ;
+ 
+
+func_arg_list:
+     identifier OP_COLON identifier { $$ = Node::add<ast::FuncArgList>($1,$3); }
+    | func_arg_list OP_COMMA identifier OP_COLON identifier{ ast::FuncArgList* FuncArgListValue=(ast::FuncArgList*)$1.get();
+		        $$ = Node::add<ast::FuncArgList>(FuncArgListValue->add_arg($3,$5));}
+    ;
+
+
 return:
     KW_RETURN stmt {$$ = Node::add<ast::KwReturn>($2);}
     ;
 
 while:
-    KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, nullptr);}
-    |KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, $6);}
-    |KW_WHILE OP_LPAREN cmp OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, nullptr);}
+    KW_WHILE OP_LPAREN stmt OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, nullptr);}
+    |KW_WHILE OP_LPAREN stmt OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwWhile>($3, $6);}
     ;
 
 if:
-    KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, nullptr);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, nullptr);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $9);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, $6, $10);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $8);}
-    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, $6, $9);}
+     KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, nullptr); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, nullptr); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR{$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $9); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $10); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR lines OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, $6, nullptr, $9); }
+    |KW_IF OP_LPAREN identifier OP_RPAREN OP_LCURLYBR OP_RCURLYBR KW_ELSE if {$$ = Node::add<ast::KwIf>($3, nullptr, nullptr, nullptr, $8); }
+    ;
+
+dot:  
+    identifier OP_DOT identifier {  $$ = Node::add<ast::OpDot>($1, $3);} 
+    | dot OP_DOT identifier {  $$ = Node::add<ast::OpDot>($1, $3);} 
+    ;
+
+call:
+    identifier OP_LPAREN call_arg_list OP_RPAREN { $$ = Node::add<ast::KwCall>($1, $3); }
+    | identifier OP_LPAREN OP_RPAREN { $$ = Node::add<ast::KwCall>($1, nullptr); }
+    | dot OP_LPAREN OP_RPAREN { $$ = Node::add<ast::KwCall>($1, nullptr); }
+    | dot OP_LPAREN call_arg_list OP_RPAREN { $$ = Node::add<ast::KwCall>($1, $3); }
+    ;
+
+call_arg_list:
+    identifier { $$ = Node::add<ast::CallArgList>($1); }
+    | call_arg_list OP_COMMA identifier{ ast::CallArgList* CallArgListValue=(ast::CallArgList*)$1.get();
+		        $$ = Node::add<ast::CallArgList>(CallArgListValue->add_arg($3));}
     ;
 
 class:
@@ -137,18 +175,19 @@ muldiv:
     ;
 
 posneg:
-    l_integer
+    l_string
+    | l_integer
     | OP_PLUS stmt { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2);}
     | OP_MINUS stmt { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2);}
     | identifier
     ;
 
 cmp:
-    identifier OP_EQUALS identifier { $$ = Node::add<ast::OpEq>($1, $3);}
-    |identifier OP_GREATEREQUALS identifier { $$ = Node::add<ast::OpGe>($1, $3);}
-    |identifier OP_GREATERTHAN identifier { $$ = Node::add<ast::OpGt>($1, $3);}
-    |identifier OP_LESSEQUALS identifier { $$ = Node::add<ast::OpLe>($1, $3);}
-    |identifier OP_LESSTHAN identifier { $$ = Node::add<ast::OpLt>($1, $3);}
+    stmt OP_EQUALS stmt { $$ = Node::add<ast::OpEq>($1, $3);}
+    |stmt OP_GREATEREQUALS stmt { $$ = Node::add<ast::OpGe>($1, $3);}
+    |stmt OP_GREATERTHAN stmt { $$ = Node::add<ast::OpGt>($1, $3);}
+    |stmt OP_LESSEQUALS stmt { $$ = Node::add<ast::OpLe>($1, $3);}
+    |stmt OP_LESSTHAN stmt { $$ = Node::add<ast::OpLt>($1, $3);}
     ;
 
 assign:
@@ -160,12 +199,12 @@ identifier:
     ;
 
 
-l_integer:
-    L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
-    ;
-
 l_string:
-    L_STRING { $$ = Node::add<ast::String>(curtoken);}
+    L_STRING  { $$ = Node::add<ast::String>(curtoken);}
+    ;
+ 
+l_integer: 
+    L_INTEGER { $$ = Node::add<ast::Integer>(curtoken);}
     ;
 %%
 
