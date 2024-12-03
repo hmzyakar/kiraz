@@ -1,13 +1,14 @@
 
-#include <cassert>
-#include <cstdio>
+#include "main.h"
 
 #include "lexer.hpp"
-#include "main.h"
 #include "parser.hpp"
+#include <cassert>
+#include <cstdio>
+#include <iostream>
 
+#include "kiraz/Compiler.h"
 #include <kiraz/Node.h>
-
 extern int yydebug;
 
 enum Status {
@@ -23,15 +24,8 @@ enum Mode {
 };
 
 static int test(std::string_view str) {
-    auto buffer = yy_scan_string(str.data());
-    auto ret = yyparse();
-    yy_delete_buffer(buffer);
-
-    if (Node::current_root()) {
-        fmt::print("{}\n", Node::current_root()->as_string());
-    }
-
-    return ret;
+    Compiler compiler;
+    return compiler.compile_string(std::string(str), std::cout);
 }
 
 static int usage(int argc, char **argv) {

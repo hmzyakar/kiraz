@@ -56,10 +56,10 @@ Node::Ptr OpAdd::compute_stmt_type(SymbolTable &st) {
     // Set error if not boths sides are Integer64
     if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
             || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format("Addition requires integer operands, but got '{}' and '{}'",
+        auto error_msg = fmt::format("Addition requires integer operands, but got '{}' and '{}'",
                 get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
+                get_right()->get_stmt_type()->get_symbol(st).name);
+        return set_error(error_msg);
     }
 
     // Set result type as integer

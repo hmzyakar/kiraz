@@ -14,9 +14,7 @@ public:
 
     std::string as_string() const override { return fmt::format("Id({})", m_value); }
 
-private:
-    Node::SymTabEntry get_symbol(const SymbolTable &st) const override;
-    Node::SymTabEntry get_symbol() const override;
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 
     const std::string &get_value() const { return m_value; }
 

@@ -3,35 +3,37 @@
 
 #include <kiraz/Node.h>
 
+// S.A. stands for Semantic Analyze
+
 namespace ast {
 
 class Module : public Node {
 public:
-    Module(Node::Cptr node) : m_node(node) {};
+    Module(Node::Ptr scope) : m_scope(scope) {};
 
+    // as_string() method override
     std::string as_string() const override {
-
-        return fmt::format("Module({})",m_node->as_string());
+        return fmt::format("Module({})", m_scope->as_string());
     }
 
+    // S.A. compute_stmt_type() method override declaration
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+
 private:
-    Node::Cptr m_node;
+    Node::Ptr m_scope;
 };
 
-
 class lines : public Node {
-    private:
-    std::vector<Node::Ptr> scope_lines;
-    public:
-        lines(Node::Ptr line) :Node(){ scope_lines.push_back(line); }
-        lines(lines *other) :Node() { *this = *other; }
-        lines *add_line(Node::Ptr line) {
-            scope_lines.push_back(line);
-            return this;
-        }
 
-    Node::Ptr compute_stmt_type(SymbolTable& st) override;
+public:
+    lines(Node::Ptr line) : Node() { scope_lines.push_back(line); }
+    lines(lines *other) : Node() { *this = *other; }
+    lines *add_line(Node::Ptr line) {
+        scope_lines.push_back(line);
+        return this;
+    }
 
+    // as_string() method override
     std::string as_string() const override {
         std::string node_list_string = "[";
         for (int i = 0; i < scope_lines.size(); i++) {
@@ -40,10 +42,13 @@ class lines : public Node {
                 node_list_string += ", ";
             }
         }
-        node_list_string =node_list_string+ "]";
+        node_list_string = node_list_string + "]";
         return node_list_string;
     }
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 
+private:
+    std::vector<Node::Ptr> scope_lines;
 };
 
 }

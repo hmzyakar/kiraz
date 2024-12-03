@@ -55,7 +55,7 @@ public:
             break;
         case OP_DOT:
             StrOP = "Dot";
-            break;       
+            break;
 
         default:
             break;
@@ -71,66 +71,66 @@ private:
 class OpAdd : public Operator {
 public:
     OpAdd(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_PLUS, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpSub : public Operator {
 public:
     OpSub(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_MINUS, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpMult : public Operator {
 public:
     OpMult(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_MULT, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpDivF : public Operator {
 public:
     OpDivF(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_DIVF, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpAssign : public Operator {
 public:
     OpAssign(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_ASSIGN, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpEq : public Operator {
 public:
     OpEq(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_EQUALS, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpGt : public Operator {
 public:
     OpGt(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_GREATERTHAN, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpGe : public Operator {
 public:
     OpGe(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_GREATEREQUALS, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpLt : public Operator {
 public:
     OpLt(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_LESSTHAN, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
 class OpLe : public Operator {
 public:
     OpLe(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_LESSEQUALS, left, right) {}
-    Node::Ptr compute_stmt_type(SymbolTable& st) override; 
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
 };
 
-class OpDot : public Operator{
+class OpDot : public Operator {
 public:
-    OpDot(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_DOT, left, right){}
+    OpDot(const Node::Ptr &left, const Node::Ptr &right) : Operator(OP_DOT, left, right) {}
 };
 
 }
