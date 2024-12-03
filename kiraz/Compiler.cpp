@@ -2,6 +2,9 @@
 #include "Compiler.h"
 #include <cassert>
 
+#include "ast/Identifier.h"
+#include "ast/Keyword.h"
+
 #include <fmt/format.h>
 
 #include <resource/FILE_io_ki.h>
@@ -101,9 +104,46 @@ int Compiler::compile(Node::Ptr root, std::ostream &ostr) {
     return 0;
 }
 
+#define IDENTIFIER(name) {name, std::make_shared<ast::Identifier>(name)}
+
+#define FUNCTION1(N, R, A1)                                                                        \
+    {N,                                                                                            \
+            std::make_shared<ast::KwFunc>(std::make_shared<ast::Identifier>(N),                    \
+                    std::make_shared<ast::FuncArgList>(std::make_shared<ast::Identifier>(A1),      \
+                            std::make_shared<ast::Identifier>(A1)),                                \
+                    std::make_shared<ast::Identifier>(R), nullptr)}
+
+#define FUNCTION2(N, R, A1, A2)                                                                    \
+    {N,                                                                                            \
+            std::make_shared<ast::KwFunc>(std::make_shared<ast::Identifier>(N),                    \
+                    std::static_pointer_cast<Node>(                                                \
+                            std::make_shared<ast::FuncArgList>(                                    \
+                                    std::make_shared<ast::Identifier>(A1),                         \
+                                    std::make_shared<ast::Identifier>(A1))                         \
+                                    ->add_arg(std::make_shared<ast::Identifier>(A2),               \
+                                            std::make_shared<ast::Identifier>(A2))),               \
+                    std::make_shared<ast::Identifier>(R), nullptr)}
+
 SymbolTable::SymbolTable()
         : m_symbols({
-                  std::make_shared<Scope>(Scope::SymTab{}, ScopeType::Module, nullptr),
+                  std::make_shared<Scope>(
+                          Scope::SymTab{
+                                  IDENTIFIER("Boolean"),
+                                  IDENTIFIER("Integer64"),
+                                  IDENTIFIER("Class"),
+                                  IDENTIFIER("Function"),
+                                  IDENTIFIER("String"),
+                                  IDENTIFIER("Module"),
+                                  IDENTIFIER("Void"),
+                                  IDENTIFIER("True"),
+                                  IDENTIFIER("False"),
+
+                                  FUNCTION2("and", "Boolean", "Boolean", "Boolean"),
+                                  FUNCTION2("or", "Boolean", "Boolean", "Boolean"),
+                                  FUNCTION1("not", "Boolean", "Boolean"),
+
+                          },
+                          ScopeType::Module, nullptr),
           }) {
     if (! s_module_io) {
         s_module_io = Compiler::current()->compile_module(FILE_io_ki);

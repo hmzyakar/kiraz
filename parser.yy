@@ -116,7 +116,7 @@ function:
 func_arg_list:
      identifier OP_COLON identifier { $$ = Node::add<ast::FuncArgList>($1,$3); }
     | func_arg_list OP_COMMA identifier OP_COLON identifier{ ast::FuncArgList* FuncArgListValue=(ast::FuncArgList*)$1.get();
-		        $$ = Node::add<ast::FuncArgList>(FuncArgListValue->add_arg($3,$5));}
+		        $$ = FuncArgListValue->add_arg($3,$5);}
     ;
 
 

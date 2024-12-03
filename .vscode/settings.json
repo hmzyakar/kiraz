@@ -80,6 +80,11 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "regex": "cpp",
+        "variant": "cpp"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
     }
 }

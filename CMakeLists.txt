@@ -141,7 +141,9 @@ add_library(kiraz STATIC
     kiraz/ast/Identifier.h
     kiraz/ast/Identifier.cpp
     kiraz/ast/Keyword.h
-    kiraz/ast/Keyword.cpp  
+    kiraz/ast/Keyword.cpp
+    kiraz/ast/Module.h
+    kiraz/ast/Module.cpp
 
 
     ${BISON_PARSER_OUTPUTS}
