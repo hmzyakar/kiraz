@@ -87,13 +87,21 @@ int Compiler::compile(Node::Ptr root, std::ostream &ostr) {
 
     SymbolTable st(ScopeType::Module);
 
-    // Perform semantic analysis
     if (auto ret = root->compute_stmt_type(st)) {
-        ostr << fmt::format(
+        auto error = fmt::format(
                 "Error at {}:{}: {}\n", ret->get_line(), ret->get_col(), ret->get_error());
+        ostr << error;
+        set_error(error);
         Node::reset_root();
         return 1;
     }
+
+    /*
+    MemoryManager mm;
+    if (auto ret = root->gen_wat(mm, ostr)) {
+        return 2;
+    }
+    */
 
     return 0;
 }

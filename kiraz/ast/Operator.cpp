@@ -44,26 +44,36 @@ Node::Ptr OpAdd::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
     // Compute left type
+    fmt::print("Computing left operand type...\n");
     if (auto ret = get_left()->compute_stmt_type(st)) {
+        fmt::print("Error computing left operand type.\n");
         return ret;
     }
 
     // Compute right type
+    fmt::print("Computing right operand type...\n");
     if (auto ret = get_right()->compute_stmt_type(st)) {
+        fmt::print("Error computing right operand type.\n");
         return ret;
     }
 
-    // Set error if not boths sides are Integer64
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
+    // Debugging: Check the types of the left and right operands
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
+    fmt::print("Left operand type: {}\n", left_type ? left_type->get_symbol(st).name : "null");
+    fmt::print("Right operand type: {}\n", right_type ? right_type->get_symbol(st).name : "null");
+
+    // Set error if not both sides are Integer64
+    if (! left_type || ! right_type || left_type->get_symbol(st).name != "Integer64"
+            || right_type->get_symbol(st).name != "Integer64") {
         auto error_msg = fmt::format("Addition requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name);
+                left_type ? left_type->get_symbol(st).name : "null",
+                right_type ? right_type->get_symbol(st).name : "null");
         return set_error(error_msg);
     }
 
     // Set result type as integer
-    set_stmt_type(get_left()->get_stmt_type());
+    set_stmt_type(left_type);
     return nullptr;
 }
 

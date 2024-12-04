@@ -15,6 +15,13 @@ public:
             , m_func_arg_list(func_arg_list)
             , m_type_annot(type_annot)
             , m_func_scope(func_scope) {}
+
+    // S.A.
+
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    Node::Ptr add_to_symtab_forward(SymbolTable &st) override;
+    bool is_func() const override { return true; }
+
     std::string as_string() const override {
 
         std::string func_name_as_string = m_func_name->as_string();
@@ -47,11 +54,10 @@ private:
 };
 
 class FuncArgList : public Node {
-private:
-    std::vector<Node::Ptr> m_identifiers;
-    std::vector<Node::Ptr> m_types_list;
 
 public:
+    std::vector<Node::Ptr> m_identifiers;
+    std::vector<Node::Ptr> m_types_list;
     FuncArgList(Node::Ptr identifier, Node::Ptr type) : Node() {
         m_identifiers.push_back(identifier);
         m_types_list.push_back(type);
@@ -64,6 +70,9 @@ public:
         m_types_list.push_back(type);
         return shared_from_this(); // Changed from 'return this'
     }
+
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    bool is_funcarg_list() const override { return true; }
 
     std::string as_string() const override {
         std::string func_arg_string = "FuncArgs([";

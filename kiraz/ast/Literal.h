@@ -12,6 +12,7 @@ public:
     std::string as_string() const override { return fmt::format("Int({})", m_value); }
 
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    Node::SymTabEntry get_symbol(const SymbolTable &st) const override;
 
 private:
     int64_t m_value;

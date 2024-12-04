@@ -18,7 +18,6 @@ public:
 
     const std::string &get_value() const { return m_value; }
 
-private:
     std::string m_value;
 };
 

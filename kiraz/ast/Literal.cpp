@@ -20,8 +20,21 @@ Integer::Integer(Token::Ptr t) : Node(L_INTEGER) {
 Node::Ptr Integer::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
-    set_stmt_type(st.get_symbol("Integer64").stmt);
+    auto integer64 = st.get_symbol("Integer64").stmt;
+    if (! integer64) {
+        return set_error("Integer64 type not found");
+    }
+    set_stmt_type(integer64);
+
     return nullptr;
+}
+Node::SymTabEntry Integer::get_symbol(const SymbolTable &st) const {
+    auto integer64 = st.get_symbol("Integer64");
+    if (! integer64) {
+        return {};
+    }
+
+    return integer64;
 }
 
 String::String(Token::Ptr t) : Node(L_STRING) {

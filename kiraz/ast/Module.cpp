@@ -20,8 +20,8 @@ Node::Ptr lines::compute_stmt_type(SymbolTable &st) {
 
 Node::Ptr Module::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
-    auto faulty_node = m_scope->compute_stmt_type(st);
-    return faulty_node;
+    auto ret = m_scope->compute_stmt_type(st);
+    return ret;
 }
 
 }

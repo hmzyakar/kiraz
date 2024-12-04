@@ -12,6 +12,9 @@
 
 #include <kiraz/Token.h>
 
+#define IDENTIFIER_STATIC_CAST(identifier_to_cast)                                                 \
+    std::static_pointer_cast<ast::Identifier>(identifier_to_cast)
+
 extern int yylineno;
 
 class SymbolTable;
