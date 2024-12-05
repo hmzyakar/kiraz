@@ -51,6 +51,9 @@ int Compiler::compile_string(const std::string &code, std::ostream &ostr) {
     buffer = yy_scan_string(code.data());
     yyparse();
     auto root = Node::get_root();
+    if (Node::current_root()) {
+        fmt::print("{}\n", Node::current_root()->as_string());
+    }
     reset();
 
     return compile(root, ostr);

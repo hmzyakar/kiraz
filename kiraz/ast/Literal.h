@@ -25,6 +25,7 @@ public:
     std::string as_string() const override { return fmt::format("Str({})", m_value); }
 
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    Node::SymTabEntry get_symbol(const SymbolTable &st) const override;
 
 private:
     std::string m_value;

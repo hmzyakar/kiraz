@@ -1,7 +1,7 @@
 #include "Operator.h"
 #include "Identifier.h"
 #include "kiraz/Compiler.h"
-
+#include "kiraz/token/Identifier.h"
 #include <iostream>
 
 // S. A. stands for Semantic Analyze
@@ -27,7 +27,6 @@ Node::Ptr OpAssign::compute_stmt_type(SymbolTable &st) {
         set_error(fmt::format("Overriding builtin '{}' is not allowed", left_node_name));
         return shared_from_this();
     }
-    std::cout << "mrb cnm2\n";
 
     // Check if left and right types are compatible
     if (get_left()->get_stmt_type()->get_symbol(st).name
@@ -44,53 +43,39 @@ Node::Ptr OpAssign::compute_stmt_type(SymbolTable &st) {
 // S. A. for ARITHMETIC OPERATIONS
 
 Node::Ptr OpAdd::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
-    // Compute left type
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
     }
 
-    // Compute right type
     if (auto ret = get_right()->compute_stmt_type(st)) {
         return ret;
     }
 
-    // Debugging: Check the types of the left and right operands
     auto left_type = get_left()->get_stmt_type();
     auto right_type = get_right()->get_stmt_type();
 
-    // Set error if not both sides are Integer64 or String
-    if (! left_type || ! right_type) {
-        auto error_msg = fmt::format("Addition requires valid operands, but got '{}' and '{}'",
-                left_type ? left_type->get_symbol(st).name : "null",
-                right_type ? right_type->get_symbol(st).name : "null");
-        return set_error(error_msg);
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(FF("Operator '+' not defined for types 'Integer64' and 'String'"));
+            }
+        }
     }
-
-    // Get the type names for cleaner code
-    const auto &left_name = left_type->get_symbol(st).name;
-    const auto &right_name = right_type->get_symbol(st).name;
-
-    // Check if both operands are integers
-    bool both_integers = (left_name == "Integer64" && right_name == "Integer64");
-    // Check if both operands are strings
-    bool both_strings = (left_name == "String" && right_name == "String");
-
-    if (! both_integers && ! both_strings) {
-        auto error_msg = fmt::format(
-                "Addition requires either two integers or two strings, but got '{}' and '{}'",
-                left_name, right_name);
-        return set_error(error_msg);
-    }
-
-    // Set result type as integer
-    set_stmt_type(left_type);
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpSub::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -100,20 +85,27 @@ Node::Ptr OpSub::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format("Subtraction requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    set_stmt_type(get_left()->get_stmt_type());
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(FF("Operator '-' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpMult::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -123,20 +115,27 @@ Node::Ptr OpMult::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format("Multiplication requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    set_stmt_type(get_left()->get_stmt_type());
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(FF("Operator '*' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpDivF::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -146,22 +145,28 @@ Node::Ptr OpDivF::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format("Division requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    set_stmt_type(get_left()->get_stmt_type());
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(FF("Operator '/' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
-
 // S. A. for COMPARISONS (LOGIC)
 
 Node::Ptr OpEq::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -171,23 +176,28 @@ Node::Ptr OpEq::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    // Set error if not both have the same type
-    if (get_left()->get_stmt_type()->get_symbol(st).name
-            != get_right()->get_stmt_type()->get_symbol(st).name) {
-        set_error(fmt::format(
-                "Equality comparison requires operands of the same type, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    // Set result type as boolean
-    set_stmt_type(Node::add<ast::Identifier>("Boolean"));
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(
+                        FF("Operator '==' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpGt::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -197,23 +207,27 @@ Node::Ptr OpGt::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    // Set error if not boths sides are Integer64
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format(
-                "Greater-than comparison requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    // Set result type as boolean
-    set_stmt_type(Node::add<ast::Identifier>("Boolean"));
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(FF("Operator '>' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpGe::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -222,24 +236,29 @@ Node::Ptr OpGe::compute_stmt_type(SymbolTable &st) {
     if (auto ret = get_right()->compute_stmt_type(st)) {
         return ret;
     }
-    auto right_as_str = get_left()->get_stmt_type()->get_symbol(st).name;
-    return set_error(fmt::format(" right: {}", right_as_str));
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format(
-                "Greater-equals comparison requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
+
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(
+                        FF("Operator '>=' not defined for types 'Integer64' and 'String'"));
+            }
+        }
     }
-
-    set_stmt_type(Node::add<ast::Identifier>("Boolean"));
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpLe::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -249,21 +268,28 @@ Node::Ptr OpLe::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format(
-                "Less-equals comparison requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    set_stmt_type(Node::add<ast::Identifier>("Boolean"));
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(
+                        FF("Operator '<=' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 
 Node::Ptr OpLt::compute_stmt_type(SymbolTable &st) {
-    set_cur_symtab(st.get_cur_symtab());
+    if (auto ret = Node::compute_stmt_type(st)) {
+        return ret;
+    }
 
     if (auto ret = get_left()->compute_stmt_type(st)) {
         return ret;
@@ -273,16 +299,21 @@ Node::Ptr OpLt::compute_stmt_type(SymbolTable &st) {
         return ret;
     }
 
-    if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
-            || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(
-                fmt::format("Less-than comparison requires integer operands, but got '{}' and '{}'",
-                        get_left()->get_stmt_type()->get_symbol(st).name,
-                        get_right()->get_stmt_type()->get_symbol(st).name));
-        return shared_from_this();
-    }
+    auto left_type = get_left()->get_stmt_type();
+    auto right_type = get_right()->get_stmt_type();
 
-    set_stmt_type(Node::add<ast::Identifier>("Boolean"));
+    if (left_type && right_type) {
+        auto left_st_entry = left_type->get_symbol(st);
+        auto right_st_entry = right_type->get_symbol(st);
+
+        if (left_st_entry.stmt && right_st_entry.stmt) {
+            if (left_st_entry.stmt->as_string() != right_st_entry.stmt->as_string()) {
+                return set_error(
+                        FF("Operator '>=' not defined for types 'Integer64' and 'String'"));
+            }
+        }
+    }
+    set_stmt_type(std::make_shared<ast::Identifier>(Token::New<token::Identifier>("Boolean")));
     return nullptr;
 }
 

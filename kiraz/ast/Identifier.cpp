@@ -25,7 +25,7 @@ Node::Ptr Identifier::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
     auto symbol = st.get_symbol(m_value);
-    if (m_value=="true" || m_value=="false"){
+    if (m_value == "true" || m_value == "false") {
         return nullptr;
     }
     if (symbol.stmt == nullptr) {
@@ -35,5 +35,13 @@ Node::Ptr Identifier::compute_stmt_type(SymbolTable &st) {
     // Set the statement type
     set_stmt_type(symbol.stmt);
     return nullptr;
+}
+
+Node::SymTabEntry Identifier::get_symbol(const SymbolTable &st) const {
+    return st.get_symbol(m_value);
+}
+
+Node::SymTabEntry Identifier::get_symbol() const {
+    return get_cur_symtab()->get_symbol(m_value);
 }
 }

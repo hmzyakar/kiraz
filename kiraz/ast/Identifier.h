@@ -16,6 +16,9 @@ public:
 
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
 
+    Node::SymTabEntry get_symbol(const SymbolTable &st) const override;
+    Node::SymTabEntry get_symbol() const override;
+
     const std::string &get_value() const { return m_value; }
 
     std::string m_value;

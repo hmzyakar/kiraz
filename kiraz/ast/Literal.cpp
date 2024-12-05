@@ -52,4 +52,11 @@ Node::Ptr String::compute_stmt_type(SymbolTable &st) {
     return nullptr;
 }
 
+Node::SymTabEntry String::get_symbol(const SymbolTable &st) const {
+    auto string = st.get_symbol("String");
+    if (! string) {
+        return {};
+    }
+    return string;
+}
 }
