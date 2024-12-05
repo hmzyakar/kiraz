@@ -2,6 +2,8 @@
 #include "Identifier.h"
 #include "kiraz/Compiler.h"
 
+#include <iostream>
+
 // S. A. stands for Semantic Analyze
 
 namespace ast {
@@ -16,15 +18,16 @@ Node::Ptr OpAssign::compute_stmt_type(SymbolTable &st) {
     if (auto ret = get_right()->compute_stmt_type(st)) {
         return ret;
     }
+    auto left_node_name = IDENTIFIER_STATIC_CAST(get_left())->m_value;
+    auto right_node_name = IDENTIFIER_STATIC_CAST(get_right())->m_value;
 
     // Check if left is builtin
-    if (get_left()->get_symbol(st).name == "void" || get_left()->get_symbol(st).name == "and"
-            || get_left()->get_symbol(st).name == "or"
-            || get_left()->get_symbol(st).name == "not") {
-        set_error(fmt::format(
-                "Overriding builtin '{}' is not allowed", get_left()->get_symbol(st).name));
+    if (left_node_name == "void" || left_node_name == "and" || left_node_name == "or"
+            || left_node_name == "not") {
+        set_error(fmt::format("Overriding builtin '{}' is not allowed", left_node_name));
         return shared_from_this();
     }
+    std::cout << "mrb cnm2\n";
 
     // Check if left and right types are compatible
     if (get_left()->get_stmt_type()->get_symbol(st).name
@@ -44,31 +47,40 @@ Node::Ptr OpAdd::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
     // Compute left type
-    fmt::print("Computing left operand type...\n");
     if (auto ret = get_left()->compute_stmt_type(st)) {
-        fmt::print("Error computing left operand type.\n");
         return ret;
     }
 
     // Compute right type
-    fmt::print("Computing right operand type...\n");
     if (auto ret = get_right()->compute_stmt_type(st)) {
-        fmt::print("Error computing right operand type.\n");
         return ret;
     }
 
     // Debugging: Check the types of the left and right operands
     auto left_type = get_left()->get_stmt_type();
     auto right_type = get_right()->get_stmt_type();
-    fmt::print("Left operand type: {}\n", left_type ? left_type->get_symbol(st).name : "null");
-    fmt::print("Right operand type: {}\n", right_type ? right_type->get_symbol(st).name : "null");
 
-    // Set error if not both sides are Integer64
-    if (! left_type || ! right_type || left_type->get_symbol(st).name != "Integer64"
-            || right_type->get_symbol(st).name != "Integer64") {
-        auto error_msg = fmt::format("Addition requires integer operands, but got '{}' and '{}'",
+    // Set error if not both sides are Integer64 or String
+    if (! left_type || ! right_type) {
+        auto error_msg = fmt::format("Addition requires valid operands, but got '{}' and '{}'",
                 left_type ? left_type->get_symbol(st).name : "null",
                 right_type ? right_type->get_symbol(st).name : "null");
+        return set_error(error_msg);
+    }
+
+    // Get the type names for cleaner code
+    const auto &left_name = left_type->get_symbol(st).name;
+    const auto &right_name = right_type->get_symbol(st).name;
+
+    // Check if both operands are integers
+    bool both_integers = (left_name == "Integer64" && right_name == "Integer64");
+    // Check if both operands are strings
+    bool both_strings = (left_name == "String" && right_name == "String");
+
+    if (! both_integers && ! both_strings) {
+        auto error_msg = fmt::format(
+                "Addition requires either two integers or two strings, but got '{}' and '{}'",
+                left_name, right_name);
         return set_error(error_msg);
     }
 

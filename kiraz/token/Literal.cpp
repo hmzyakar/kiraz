@@ -2,8 +2,10 @@
 #include "Literal.h"
 
 namespace token {
-Integer::~Integer(){}
+Integer::~Integer() {}
 
-String::~String(){}
+String::~String() {}
+
+Boolean::~Boolean() {}
 
 }

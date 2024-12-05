@@ -15,6 +15,10 @@
 #define IDENTIFIER_STATIC_CAST(identifier_to_cast)                                                 \
     std::static_pointer_cast<ast::Identifier>(identifier_to_cast)
 
+#define INT_STATIC_CAST(identifier_to_cast) std::static_pointer_cast<ast::Integer>(int_to_cast)
+
+#define STR_STATIC_CAST(identifier_to_cast) std::static_pointer_cast<ast::String>(str_to_cast)
+
 extern int yylineno;
 
 class SymbolTable;

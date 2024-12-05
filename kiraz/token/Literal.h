@@ -24,22 +24,37 @@ private:
     std::string m_value;
 };
 
+class String : public Token {
+public:
+    String(std::string_view value) : Token(L_STRING), m_value(value) {}
+    virtual ~String();
 
-    class String : public Token {
-        public:
-        String(std::string_view value) : Token(L_STRING),m_value(value){}
-        virtual ~String();
+    std::string as_string() const override { return fmt::format("Str({})", m_value); }
+    void print() { fmt::print("{}\n", as_string()); }
 
-        std::string as_string() const override {return fmt::format("STRING_{}",m_value);}
-        void print(){fmt::print("{}\n",as_string());}
+    static int colno;
 
-        static int colno;
+    auto get_value() const { return m_value; }
 
-        auto get_value() const {return m_value;}
+private:
+    std::string m_value;
+};
 
-        private:
-            std::string m_value;
-    };
+class Boolean : public Token {
+public:
+    Boolean(std::string_view boolean_text) : Token(L_BOOLEAN), m_value(boolean_text) {}
+    virtual ~Boolean();
+
+    std::string as_string() const override { return fmt::format("Bool({})", m_value); }
+    void print() { fmt::print("{}\n", as_string()); }
+
+    static int colno;
+
+    auto get_value() const { return m_value; }
+
+private:
+    std::string m_value;
+};
 
 }
 

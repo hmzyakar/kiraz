@@ -5,6 +5,8 @@
 #include <iostream>
 #include <kiraz/Node.h>
 
+// S.A. stands for Semantic Analyze
+
 namespace ast {
 
 class KwFunc : public Node {
@@ -16,26 +18,23 @@ public:
             , m_type_annot(type_annot)
             , m_func_scope(func_scope) {}
 
-    // S.A.
-
+    // S.A. overrides
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
     Node::Ptr add_to_symtab_forward(SymbolTable &st) override;
     bool is_func() const override { return true; }
+    //
 
     std::string as_string() const override {
-
         std::string func_name_as_string = m_func_name->as_string();
         std::string func_arg_list_as_string;
         std::string type_annot_as_string = m_type_annot->as_string();
         std::string m_func_scope_as_string;
-
         if (m_func_arg_list == nullptr) {
             func_arg_list_as_string = "[]";
         }
         else {
             func_arg_list_as_string = m_func_arg_list->as_string();
         }
-
         if (m_func_scope == nullptr) {
             m_func_scope_as_string = "[]";
         }
@@ -54,25 +53,26 @@ private:
 };
 
 class FuncArgList : public Node {
-
 public:
     std::vector<Node::Ptr> m_identifiers;
     std::vector<Node::Ptr> m_types_list;
+
     FuncArgList(Node::Ptr identifier, Node::Ptr type) : Node() {
         m_identifiers.push_back(identifier);
         m_types_list.push_back(type);
     }
     FuncArgList(FuncArgList *other) : Node() { *this = *other; }
 
-    // Modified return type from FuncArgList* to Node::Ptr
     Node::Ptr add_arg(Node::Ptr iden, Node::Ptr type) {
         m_identifiers.push_back(iden);
         m_types_list.push_back(type);
-        return shared_from_this(); // Changed from 'return this'
+        return shared_from_this();
     }
 
+    // S.A. additions
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
     bool is_funcarg_list() const override { return true; }
+    //
 
     std::string as_string() const override {
         std::string func_arg_string = "FuncArgs([";
@@ -89,12 +89,15 @@ public:
 };
 
 class KwLet : public Node {
-
 public:
     KwLet(Node::Ptr variable_node, Node::Ptr type_node, Node::Ptr init_value_node)
             : m_variable_node(variable_node)
             , m_type_node(type_node)
             , m_init_value_node(init_value_node) {}
+
+    // S.A. additions
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    //
 
     std::string as_string() const override {
         std::string m_variable_node_string = m_variable_node->as_string();
@@ -121,9 +124,9 @@ private:
 };
 
 class KwImport : public Node {
-
 public:
     KwImport(Node::Ptr lib_node) : m_lib_node(lib_node) {}
+
     std::string as_string() const override {
         return fmt::format("Import({})", m_lib_node->as_string());
     }
@@ -133,9 +136,13 @@ private:
 };
 
 class KwReturn : public Node {
-
 public:
     KwReturn(Node::Ptr ret_node) : m_ret_node(ret_node) {}
+
+    // S.A. additions
+    // Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    //
+
     std::string as_string() const override {
         return fmt::format("Return({})", m_ret_node->as_string());
     }
@@ -147,6 +154,7 @@ private:
 class KwWhile : public Node {
 public:
     KwWhile(Node::Ptr check, Node::Ptr repeat) : m_check(check), m_repeat(repeat) {}
+
     std::string as_string() const override {
         std::string check_as_string = m_check->as_string();
         std::string repeat_as_string;
@@ -158,6 +166,10 @@ public:
         }
         return fmt::format("While(?={}, repeat={})", check_as_string, repeat_as_string);
     }
+
+    // S.A. additions
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    //
 
 private:
     Node::Ptr m_check;
@@ -173,6 +185,11 @@ public:
             , m_if_scope(if_scope)
             , m_else_if_scope(else_if_scope)
             , m_else_scope(else_scope) {}
+
+    // S.A. additions
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    //
+
     std::string as_string() const override {
         std::string if_check_as_string = m_if_check->as_string();
         std::string if_scope_as_string;
@@ -211,6 +228,10 @@ public:
             : m_class_name(class_name), m_class_scope(class_scope) {
         assert(class_name);
     }
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    Node::Ptr add_to_symtab_forward(SymbolTable &st) override;
+    bool is_class() const override { return true; }
+
     std::string as_string() const override {
         std::string class_name_as_string = m_class_name->as_string();
         std::string m_class_scope_as_string;
