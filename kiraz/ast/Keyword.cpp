@@ -105,15 +105,14 @@ Node::Ptr KwLet::compute_stmt_type(SymbolTable &st) {
     auto var_name = IDENTIFIER_STATIC_CAST(m_variable_node)->m_value;
     // Check if name starts with uppercase
 
-    if (st.get_symbol(var_name).first_letter_uppercase()) {
-        return set_error(
-                fmt::format("Variable name '{}' can not start with an uppercase letter", var_name));
-    }
     // Check if variable already exists in current scope
     if (st.get_symbol(var_name)) {
         return set_error(fmt::format("Identifier '{}' is already in symtab", var_name));
     }
-
+    if (st.get_symbol(var_name).first_letter_uppercase()) {
+        return set_error(
+                fmt::format("Variable name '{}' can not start with an uppercase letter", var_name));
+    }
     // If init_value value is provided, check its type
     if (m_init_value_node) {
         if (auto ret = m_init_value_node->compute_stmt_type(st)) {
@@ -248,7 +247,7 @@ Node::Ptr KwIf::compute_stmt_type(SymbolTable &st) {
 
     return nullptr;
 }
-/*
+
 Node::Ptr KwReturn::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
@@ -256,28 +255,27 @@ Node::Ptr KwReturn::compute_stmt_type(SymbolTable &st) {
     if (st.get_cur_symtab()->scope_type != ScopeType::Func) {
         return set_error("Misplaced return statement");
     }
-
-    // Handle return expression if present
-    if (m_ret_node) {
-        if (auto ret = m_ret_node->compute_stmt_type(st)) {
-            return ret;
+    /*
+        // Handle return expression if present
+        if (m_ret_node) {
+            if (auto ret = m_ret_node->compute_stmt_type(st)) {
+                return ret;
+            }
+            auto ret_type = m_ret_node->get_stmt_type();
+            if (ret_type != func_return_type) {
+                auto func_type_name = func_return_type->as_string();
+                auto expr_type_name = ret_type->as_string();
+                return set_error(fmt::format(
+                        "Return statement type '{}' does not match function return type '{}'",
+    ret_type, func_type_name));
+            }
         }
-        auto ret_type = m_ret_node->get_stmt_type();
-        if (ret_type != func_return_type) {
-            auto func_type_name = func_return_type->as_string();
-            auto expr_type_name = ret_type->as_string();
-            return set_error(fmt::format(
-                    "Return statement type '{}' does not match function return type '{}'", ret_type,
-                    func_type_name));
-        }
-    }
 
-    // Set the return statement's type to match the function's return type
-    set_stmt_type(func_return_type);
-
+        // Set the return statement's type to match the function's return type
+        set_stmt_type(func_return_type);
+*/
     return nullptr;
 }
-*/
 
 Node::Ptr KwClass::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
@@ -288,6 +286,15 @@ Node::Ptr KwClass::compute_stmt_type(SymbolTable &st) {
     if (st.get_symbol(class_name).first_letter_lowercase()) {
         return set_error(
                 fmt::format("Class name '{}' can not start with an lowercase letter", class_name));
+    }
+
+    // Is there class to inherit
+    if (m_class_to_inherit) {
+        auto parent_name = IDENTIFIER_STATIC_CAST(m_class_to_inherit)->m_value;
+        auto parent_class = st.get_symbol(parent_name);
+        if (! parent_class) {
+            return set_error(fmt::format("Type '{}' is not found", parent_name));
+        }
     }
 
     auto class_scope = st.enter_scope(ScopeType::Class, shared_from_this());
@@ -308,11 +315,10 @@ Node::Ptr KwClass::add_to_symtab_forward(SymbolTable &st) {
     auto class_name = IDENTIFIER_STATIC_CAST(m_class_name)->m_value;
 
     if (st.get_symbol(class_name)) {
-        return set_error("Class name '" + class_name + "' is already defined.");
+        return set_error(fmt::format("Identifier '{}' is already in symtab", class_name));
     }
 
     st.add_symbol(class_name, shared_from_this());
     return nullptr;
 }
-
 }

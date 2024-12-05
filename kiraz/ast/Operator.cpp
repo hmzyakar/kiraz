@@ -222,11 +222,13 @@ Node::Ptr OpGe::compute_stmt_type(SymbolTable &st) {
     if (auto ret = get_right()->compute_stmt_type(st)) {
         return ret;
     }
+    auto right_as_str = get_left()->get_stmt_type()->get_symbol(st).name;
+    return set_error(fmt::format(" right: {}", right_as_str));
 
     if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
             || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
         set_error(fmt::format(
-                "Greater-than comparison requires integer operands, but got '{}' and '{}'",
+                "Greater-equals comparison requires integer operands, but got '{}' and '{}'",
                 get_left()->get_stmt_type()->get_symbol(st).name,
                 get_right()->get_stmt_type()->get_symbol(st).name));
         return shared_from_this();
@@ -250,7 +252,7 @@ Node::Ptr OpLe::compute_stmt_type(SymbolTable &st) {
     if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
             || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
         set_error(fmt::format(
-                "Greater-than comparison requires integer operands, but got '{}' and '{}'",
+                "Less-equals comparison requires integer operands, but got '{}' and '{}'",
                 get_left()->get_stmt_type()->get_symbol(st).name,
                 get_right()->get_stmt_type()->get_symbol(st).name));
         return shared_from_this();
@@ -273,10 +275,10 @@ Node::Ptr OpLt::compute_stmt_type(SymbolTable &st) {
 
     if (get_left()->get_stmt_type()->get_symbol(st).name != "Integer64"
             || get_right()->get_stmt_type()->get_symbol(st).name != "Integer64") {
-        set_error(fmt::format(
-                "Greater-than comparison requires integer operands, but got '{}' and '{}'",
-                get_left()->get_stmt_type()->get_symbol(st).name,
-                get_right()->get_stmt_type()->get_symbol(st).name));
+        set_error(
+                fmt::format("Less-than comparison requires integer operands, but got '{}' and '{}'",
+                        get_left()->get_stmt_type()->get_symbol(st).name,
+                        get_right()->get_stmt_type()->get_symbol(st).name));
         return shared_from_this();
     }
 

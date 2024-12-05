@@ -158,9 +158,13 @@ call_arg_list:
 		        $$ = Node::add<ast::CallArgList>(CallArgListValue->add_arg($3));}
     ;
 
+
 class:
-    KW_CLASS identifier OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, nullptr);}
-    |KW_CLASS identifier OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, $4);}
+    KW_CLASS identifier OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, nullptr, nullptr);}
+    |KW_CLASS identifier OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, nullptr, $4);}
+    |KW_CLASS identifier OP_COLON identifier OP_LCURLYBR OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, $4, nullptr);}
+    |KW_CLASS identifier OP_COLON identifier OP_LCURLYBR lines OP_RCURLYBR {$$ = Node::add<ast::KwClass>($2, $4, $6);}
+    ;
 
 addsub:
     muldiv

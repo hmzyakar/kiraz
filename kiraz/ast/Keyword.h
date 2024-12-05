@@ -140,7 +140,7 @@ public:
     KwReturn(Node::Ptr ret_node) : m_ret_node(ret_node) {}
 
     // S.A. additions
-    // Node::Ptr compute_stmt_type(SymbolTable &st) override;
+    Node::Ptr compute_stmt_type(SymbolTable &st) override;
     //
 
     std::string as_string() const override {
@@ -222,10 +222,14 @@ class KwClass : public Node {
 private:
     Node::Ptr m_class_name;
     Node::Ptr m_class_scope;
+    Node::Ptr m_class_to_inherit;
 
 public:
-    KwClass(const Node::Ptr class_name, const Node::Ptr class_scope = nullptr)
-            : m_class_name(class_name), m_class_scope(class_scope) {
+    KwClass(const Node::Ptr class_name, const Node::Ptr class_to_inherit,
+            const Node::Ptr class_scope = nullptr)
+            : m_class_name(class_name)
+            , m_class_to_inherit(class_to_inherit)
+            , m_class_scope(class_scope) {
         assert(class_name);
     }
     Node::Ptr compute_stmt_type(SymbolTable &st) override;
