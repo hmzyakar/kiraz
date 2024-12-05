@@ -45,7 +45,7 @@ public:
     Boolean(std::string_view boolean_text) : Token(L_BOOLEAN), m_value(boolean_text) {}
     virtual ~Boolean();
 
-    std::string as_string() const override { return fmt::format("Bool({})", m_value); }
+    std::string as_string() const override { return fmt::format("BOOLEAN_{}", m_value); }
     void print() { fmt::print("{}\n", as_string()); }
 
     static int colno;

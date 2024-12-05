@@ -184,11 +184,10 @@ Node::Ptr KwWhile::compute_stmt_type(SymbolTable &st) {
 
     auto m_check_value = m_check->as_string();
 
-    if (m_check_value!="Id(false)") {
-        if (m_check_value!="Id(true)")
-        {
+    if (m_check_value != "Id(false)") {
+        if (m_check_value != "Id(true)") {
             return set_error("While only accepts tests of type 'Boolean'");
-            }
+        }
     }
 
     if (m_repeat) {
@@ -219,7 +218,7 @@ Node::Ptr KwIf::compute_stmt_type(SymbolTable &st) {
     }
 
     auto test_error = m_if_check->compute_stmt_type(st);
-    if (test_error) {
+    if (! test_error) {
         return test_error;
     }
 
@@ -228,11 +227,10 @@ Node::Ptr KwIf::compute_stmt_type(SymbolTable &st) {
     auto m_check_value = m_if_check->as_string();
 
     if (m_if_check->get_stmt_type() != boolean_type.stmt) {
-        if (m_check_value!="Id(false)") {
-            if (m_check_value!="Id(true)")
-                 {
+        if (m_check_value != "Id(false)") {
+            if (m_check_value != "Id(true)") {
                 return set_error("If only accepts tests of type 'Boolean'");
-                }
+            }
         }
     }
     // Check then body

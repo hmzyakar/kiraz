@@ -37,6 +37,17 @@ Node::SymTabEntry Integer::get_symbol(const SymbolTable &st) const {
     return integer64;
 }
 
+Boolean::Boolean(Token::Ptr t) : Node(L_BOOLEAN) {
+    assert(t->get_id() == L_BOOLEAN);
+    auto token_boolean = std::static_pointer_cast<token::Boolean>(t);
+    try {
+        m_value = token_boolean->get_value();
+    }
+    catch (std::out_of_range &e) {
+        // TO DO mark this node as invalid
+    }
+}
+
 String::String(Token::Ptr t) : Node(L_STRING) {
     assert(t->get_id() == L_STRING);
     auto token_str = std::static_pointer_cast<const token::String>(t);

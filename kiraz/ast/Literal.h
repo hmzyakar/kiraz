@@ -18,6 +18,18 @@ private:
     int64_t m_value;
 };
 
+class Boolean : public Node {
+public:
+    Boolean(Token::Ptr);
+
+    std::string as_string() const override { return fmt::format("Boolean({})", m_value); }
+
+    // Node::Ptr compute_stmt_type(SymbolTable &st) override;
+
+private:
+    std::string m_value;
+};
+
 class String : public Node {
 public:
     String(Token::Ptr);

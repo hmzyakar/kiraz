@@ -181,6 +181,7 @@ muldiv:
 posneg:
     l_string
     | l_integer
+    | l_boolean
     | OP_PLUS stmt { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2);}
     | OP_MINUS stmt { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2);}
     | identifier
@@ -202,6 +203,9 @@ identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken);}
     ;
 
+l_boolean:
+    L_BOOLEAN {$$ = Node::add<ast::Boolean>(curtoken);}
+;
 
 l_string:
     L_STRING  { $$ = Node::add<ast::String>(curtoken);}
