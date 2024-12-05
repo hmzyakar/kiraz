@@ -25,6 +25,9 @@ Node::Ptr Identifier::compute_stmt_type(SymbolTable &st) {
     set_cur_symtab(st.get_cur_symtab());
 
     auto symbol = st.get_symbol(m_value);
+    if (m_value=="true" || m_value=="false"){
+        return nullptr;
+    }
     if (symbol.stmt == nullptr) {
         return set_error(fmt::format("Identifier '{}' is not found", m_value));
     }
